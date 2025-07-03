@@ -19,5 +19,9 @@ public class Installer : MonoInstaller
 
 		Container.BindFactory<ItemView, ItemView.Factory>().FromComponentInNewPrefab(itemViewPrefab);
 		Container.Bind<IGUIManager>().FromInstance(GetComponent<GUIManager>()).AsSingle();
+
+
+		Container.Bind<GameStateModel>().AsSingle().WithArguments(1000);
+		Container.BindInterfacesAndSelfTo<GamePresenter>().AsSingle().WithArguments(GetComponent<GameView>());
 	}
 }
