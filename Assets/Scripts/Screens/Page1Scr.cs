@@ -17,6 +17,6 @@ public class Page1Scr : ScrAbs
 	}
 	public override void Hide() {
 		base.Hide();
-		presenter.Dispose();
+		presenter.Stop();
 	}
 }

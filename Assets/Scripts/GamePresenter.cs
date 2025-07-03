@@ -1,37 +1,41 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 using Cysharp.Threading.Tasks;
 using System;
-using System.Threading;
-using UnityEngine;
 
-public class GamePresenter : IDisposable {
+public class GamePresenter {
 	private readonly GameStateModel _model;
 	private readonly IGameView _view;
-
-	private CancellationTokenSource _cts;
+	private readonly IAsyncTimer _autoCollectTimer;
+	private readonly IAsyncTimer _energyTimer;
+	
 
 	public GamePresenter(GameStateModel model, IGameView view) {
 		_model = model;
-		_view = view;		
-
+		_view = view;
+		_autoCollectTimer = new AsyncTimer();
+		_energyTimer = new AsyncTimer();
 	}
-	public void Start() {
-		_cts = new();
+	public void Start() {	
+
 		_model.Currency.OnChanged += OnCurrencyChanged;
 		_model.Energy.OnChanged += OnEnergyChanged;
 
-		// сразу отрисовать начальные данные
 		_view.SetCurrency(_model.Currency.Value);
 		_view.SetEnergy(_model.Energy.Value);
-
-		// подписываемся на клики
+				
 		_view.OnButtonClick += OnButtonClicked;
-		StartAutoCollect(_cts.Token).Forget();
-		StartEnergyReplenish(_cts.Token).Forget();
+		
+		_autoCollectTimer.Start(async () => {
+			TryCollect();
+			await UniTask.CompletedTask;
+		}, TimeSpan.FromSeconds(3));
+
+		_energyTimer.Start(async () => {
+			_model.Energy.Add(10);
+			await UniTask.CompletedTask;
+		}, TimeSpan.FromSeconds(10));
 	}
+
+
 	private void OnCurrencyChanged(int value) {
 		_view.SetCurrency(value);
 	}
@@ -53,26 +57,14 @@ public class GamePresenter : IDisposable {
 			_view.PlayNoEnergyEffect(); // вибрация, мигание и т.д.
 		}
 	}
+	
+	public void Stop() {
+		//_cts.Cancel();
 
-	private async UniTaskVoid StartAutoCollect(CancellationToken token) {
-		while (!token.IsCancellationRequested) {
-			await UniTask.Delay(TimeSpan.FromSeconds(3), cancellationToken: token);
-			TryCollect();
-		}
-	}
-
-	private async UniTaskVoid StartEnergyReplenish(CancellationToken token) {
-		while (!token.IsCancellationRequested) {
-			await UniTask.Delay(TimeSpan.FromSeconds(10), cancellationToken: token);
-			_model.Energy.Add(10);
-		}
-	}
-
-	public void Dispose() {
-		_cts.Cancel();
+		_autoCollectTimer.Stop();
+		_energyTimer.Stop();
 
 		_view.OnButtonClick -= OnButtonClicked;
-
 		_model.Currency.OnChanged -= OnCurrencyChanged;
 		_model.Energy.OnChanged -= OnEnergyChanged;
 	}
