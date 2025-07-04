@@ -1,9 +1,5 @@
 public enum EventId {
 	MenuEvent,
-	gameEasyPlay,
-	gameHardPlay,
-	OnCollisionPlayer,
-	OnCollisionEnemy,	
 	OnSound,
 	OnMusic
 }

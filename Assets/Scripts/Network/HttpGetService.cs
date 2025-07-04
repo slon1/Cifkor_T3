@@ -36,17 +36,16 @@ public class HttpGetService : IHttpGetService, IDisposable {
 	}
 
 	public UniTask<string> EnqueueRequest(string url, Action onStart = null, Action onComplete = null) {
-		// 1. Удаляем предыдущий запрос с этим URL из очереди
+		
 		_requestQueue.RemoveWhere(r => r.Url == url);
-
-		// 2. Отменяем активный запрос на этот URL, если есть
+		
 		if (_activeRequests.TryGetValue(url, out var cts)) {
 			cts.Cancel();
 			cts.Dispose();
 			_activeRequests.Remove(url);
 		}
 
-		// 3. Создаем новый запрос
+		
 		var tcs = new UniTaskCompletionSource<string>();
 		_requestQueue.Enqueue(new RequestData {
 			Url = url,
@@ -63,10 +62,9 @@ public class HttpGetService : IHttpGetService, IDisposable {
 	}
 
 	public void CancelRequest(string url) {
-		// 1. Если в очереди — удаляем
+		
 		_requestQueue.RemoveWhere(r => r.Url == url);
-
-		// 2. Если в процессе — отменяем
+		
 		if (_activeRequests.TryGetValue(url, out var cts)) {
 			cts.Cancel();
 			cts.Dispose();

@@ -13,7 +13,7 @@ public abstract class ScrAbs : MonoBehaviour, IPage {
 	[SerializeField]
 	protected PanelId panelId;
 	private CanvasGroup canvas;
-
+	
 	public GameObject Root => root;
 
 	public PanelId PanelID => panelId;
@@ -29,6 +29,8 @@ public abstract class ScrAbs : MonoBehaviour, IPage {
 
 	private void Awake() {
 		canvas = GetComponent<CanvasGroup>();
+		
+		canvas.alpha = Static? 1:0;
 	}
 
 	public virtual void Init() {

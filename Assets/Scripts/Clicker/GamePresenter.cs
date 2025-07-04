@@ -14,8 +14,8 @@ public class GamePresenter {
 		_autoCollectTimer = new AsyncTimer();
 		_energyTimer = new AsyncTimer();
 	}
-	public void Start() {	
-
+	public void Start() {
+	
 		_model.Currency.OnChanged += OnCurrencyChanged;
 		_model.Energy.OnChanged += OnEnergyChanged;
 
@@ -67,5 +67,7 @@ public class GamePresenter {
 		_view.OnButtonClick -= OnButtonClicked;
 		_model.Currency.OnChanged -= OnCurrencyChanged;
 		_model.Energy.OnChanged -= OnEnergyChanged;
+		_view.Clear();
+	
 	}
 }

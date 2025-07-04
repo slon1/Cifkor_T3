@@ -7,6 +7,7 @@ public class Installer : MonoInstaller
 {
 	[SerializeField] private HttpGetConfig _config;
 	[SerializeField] private GameObject itemViewPrefab;
+	
 	public override void InstallBindings() {
 		// Конфиг
 		Container.Bind<HttpGetConfig>().FromInstance(_config).AsSingle();
@@ -23,5 +24,8 @@ public class Installer : MonoInstaller
 
 		Container.Bind<GameStateModel>().AsSingle().WithArguments(1000);
 		Container.BindInterfacesAndSelfTo<GamePresenter>().AsSingle().WithArguments(GetComponent<GameView>());
+
+
+		
 	}
 }
