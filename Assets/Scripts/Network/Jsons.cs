@@ -115,3 +115,9 @@ public class WeatherRoot {
 	public Geometry geometry { get; set; }
 	public Properties properties { get; set; }
 }
+
+
+public class DogInfo {
+	public Data data { get; set; }
+	public Links links { get; set; }
+}

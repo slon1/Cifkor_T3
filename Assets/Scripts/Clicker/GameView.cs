@@ -30,7 +30,7 @@ public class GameView : MonoBehaviour, IGameView {
 	private AnimatorManager animatorCollectEffect;
 	private AnimatorManager animatorCoinUp;
 
-	private bool canceled;
+	
 	CancellationTokenSource cts = new();
 	private void Awake() {
 		_collectButton.onClick.AddListener(() => OnButtonClick?.Invoke());
@@ -50,7 +50,7 @@ public class GameView : MonoBehaviour, IGameView {
 	public async void PlayCollectEffect() {
 		cts = null;
 		cts = new();
-		canceled = false;
+		
 		var stratPosition = (Vector2)_collectButton.transform.position;
 		Vector2 offset = new Vector2(0,0.2f);
 		try {
@@ -68,7 +68,7 @@ public class GameView : MonoBehaviour, IGameView {
 	public void Clear() {
 		animatorCoinUp.StopAll();
 		animatorCollectEffect.StopAll();
-		canceled = true;
+		
 		cts.Cancel();
 	}
 
@@ -80,7 +80,7 @@ public class GameView : MonoBehaviour, IGameView {
 	private void OnDestroy() {		
 		animatorCoinUp.Dispose();
 		animatorCollectEffect.Dispose();
-		canceled = true;
+		
 		cts.Cancel();
 	}
 }

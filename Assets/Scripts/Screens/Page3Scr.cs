@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
 using Zenject;
-using static UnityEditor.Progress;
+
 
 public class Page3Scr : ScrAbs
 {
@@ -48,20 +48,21 @@ public class Page3Scr : ScrAbs
 	}
 
 	private async void ItemView_OnClick(string str) {
-		var id = data.FirstOrDefault(x => x.attributes.name==str).id;
-		var id1 = data.FirstOrDefault(x => x.attributes.name == str).attributes.description;
-		var tt=await GetInfoAsync(id);
+		var info = data.FirstOrDefault(x => x.attributes.name == str);
+		var id = info.id;
+		//var description = info.attributes.description;
+		var description=await GetInfoAsync(id);
 		gui.ShowPanelModal(PanelId.info, true);
 		gui.Execute<string>(PanelId.info, PageActionId.SetTitleInfo, str);
-		gui.Execute<string>(PanelId.info, PageActionId.SetTextInfo, id1);
+		gui.Execute<string>(PanelId.info, PageActionId.SetTextInfo, description.data.attributes.description);
 	}
 
 	public override void Hide() {
 		base.Hide();
 	}
 
-	private async UniTask<Data> GetInfoAsync(string id) {
-		var result = await jsonService.GetJsonAsync<Data>(
+	private async UniTask<DogInfo> GetInfoAsync(string id) {
+		var result = await jsonService.GetJsonAsync<DogInfo>(
 			Path.Combine(ServerUrl,id),
 			() => RaiseEvent(ButtonId.ShowTimer),
 			() => RaiseEvent(ButtonId.HideTimer)
