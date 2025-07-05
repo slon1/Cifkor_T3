@@ -9,7 +9,7 @@ public class GUIManager : MonoBehaviour, IGUIManager {
 	private Dictionary<PanelId, IPage> panels;
 	[SerializeField]
 	private List<ScrAbs> screens;
-
+	private PanelId lastOpen;
 
 	private void Start() {
 		Initialize();
@@ -23,6 +23,7 @@ public class GUIManager : MonoBehaviour, IGUIManager {
 	}
 
 	private void OnMenuEvent(ButtonId id) {
+		
 		switch (id) {
 			case ButtonId.GotoPage1:
 				ShowPanel(PanelId.page1);				
@@ -63,18 +64,23 @@ public class GUIManager : MonoBehaviour, IGUIManager {
 
 	}
 	public void ShowPanel(PanelId panelId) {
+		if (lastOpen == panelId) 
+			{ return; }
+
 		foreach (var panel in panels.Values) {
 			if (panel.IsStatic()) {
 				continue;
 			}
 			if (panel.PanelID == panelId) {
 
-				panel.Show();
+				panel.Show();				
 			}
 			else {
 				panel.Hide();
 			}
 		}
+
+		lastOpen = panelId;
 
 	}
 

@@ -12,7 +12,7 @@ public class Page2Scr : ScrAbs {
 	private Text text;
 	private IHttpGetJsonService jsonService;
 	private AsyncTimer timer;
-	private bool started;
+
 	[Inject]
 	private void Construct(IHttpGetJsonService jsonService) {
 		this.jsonService = jsonService;
@@ -23,11 +23,8 @@ public class Page2Scr : ScrAbs {
 		timer = new AsyncTimer();
 	}
 	public override void Show() {
-		if (!started) {
-			started = true;
-			base.Show();
-			timer.Start(UpdateWeatherAsync, TimeSpan.FromSeconds(5));
-		}
+		base.Show();
+		timer.Start(UpdateWeatherAsync, TimeSpan.FromSeconds(5));
 
 	}
 
@@ -36,7 +33,6 @@ public class Page2Scr : ScrAbs {
 		base.Hide();
 		timer?.Stop();
 		jsonService.CancelRequest(ServerUrl);
-		started = false;
 
 	}
 

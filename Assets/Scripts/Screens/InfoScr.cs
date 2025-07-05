@@ -20,7 +20,7 @@ public class InfoScr : ScrAbs
 	private Button closeBtn;
 	
 	
-	public override async void Show() {
+	public override void Show() {
 		base.Show();
 		closeBtn.onClick.AddListener(()=>RaiseEvent(ButtonId.CloseInfo));
 	

@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-/// <summary>
-/// Расширение для удаления элемента из очереди по условию
-/// </summary>
+
 public static class QueueExtensions {
 	public static void RemoveWhere<T>(this Queue<T> queue, Predicate<T> predicate) {
 		var items = queue.ToArray();

@@ -1,6 +1,5 @@
 using Cysharp.Threading.Tasks;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
@@ -10,8 +9,8 @@ public class HttpGetService : IHttpGetService, IDisposable {
 	public event Action<string> OnRequestStarted;
 	public event Action<string> OnRequestCompleted;
 
-	private readonly Queue<RequestData> _requestQueue = new();
-	private readonly Dictionary<string, CancellationTokenSource> _activeRequests = new();
+	private readonly Queue<RequestData> requestQueue = new();
+	private readonly Dictionary<string, CancellationTokenSource> activeRequests = new();
 	private readonly HttpGetConfig config;	
 
 	private class RequestData {
@@ -22,39 +21,38 @@ public class HttpGetService : IHttpGetService, IDisposable {
 	}
 
 	public HttpGetService(HttpGetConfig config) {
-		this.config = config;
-		
+		this.config = config;		
 	}
 
 	
 	public void Dispose() {
-		foreach (var cts in _activeRequests.Values) {
+		foreach (var cts in activeRequests.Values) {
 			cts.Cancel();
 			cts.Dispose();
 		}
-		_activeRequests.Clear();
+		activeRequests.Clear();
 	}
 
 	public UniTask<string> EnqueueRequest(string url, Action onStart = null, Action onComplete = null) {
 		
-		_requestQueue.RemoveWhere(r => r.Url == url);
+		requestQueue.RemoveWhere(r => r.Url == url);
 		
-		if (_activeRequests.TryGetValue(url, out var cts)) {
+		if (activeRequests.TryGetValue(url, out var cts)) {
 			cts.Cancel();
 			cts.Dispose();
-			_activeRequests.Remove(url);
+			activeRequests.Remove(url);
 		}
 
 		
 		var tcs = new UniTaskCompletionSource<string>();
-		_requestQueue.Enqueue(new RequestData {
+		requestQueue.Enqueue(new RequestData {
 			Url = url,
 			OnStart = onStart,
 			OnComplete = onComplete,
 			CompletionSource = tcs
 		});
 
-		if (_requestQueue.Count==1) {
+		if (requestQueue.Count==1) {
 			ProcessQueue().Forget();
 		}
 
@@ -63,22 +61,22 @@ public class HttpGetService : IHttpGetService, IDisposable {
 
 	public void CancelRequest(string url) {
 		
-		_requestQueue.RemoveWhere(r => r.Url == url);
+		requestQueue.RemoveWhere(r => r.Url == url);
 		
-		if (_activeRequests.TryGetValue(url, out var cts)) {
+		if (activeRequests.TryGetValue(url, out var cts)) {
 			cts.Cancel();
 			cts.Dispose();
-			_activeRequests.Remove(url);
+			activeRequests.Remove(url);
 		}
 	}
 
 	private async UniTaskVoid ProcessQueue() {
 		
 
-		while (_requestQueue.Count > 0) {
-			var request = _requestQueue.Dequeue();
+		while (requestQueue.Count > 0) {
+			var request = requestQueue.Dequeue();
 			var cts = new CancellationTokenSource();
-			_activeRequests[request.Url] = cts;
+			activeRequests[request.Url] = cts;
 
 			request.OnStart?.Invoke();
 			OnRequestStarted?.Invoke(request.Url);
@@ -111,7 +109,7 @@ public class HttpGetService : IHttpGetService, IDisposable {
 				request.OnComplete?.Invoke();
 				OnRequestCompleted?.Invoke(request.Url);
 
-				_activeRequests.Remove(request.Url);
+				activeRequests.Remove(request.Url);
 				cts.Dispose();
 			}
 		}

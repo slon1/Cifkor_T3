@@ -53,14 +53,15 @@ public abstract class ScrAbs : MonoBehaviour, IPage {
 	protected void RaiseEvent(ButtonId buttonId) {
 		EventBus.Bus.Invoke(EventId.MenuEvent, buttonId);
 	}
-	
 
 
+	private Tween fadeTween;
 
 	public virtual void Hide() {
 		if (root != null) {
+			fadeTween?.Kill();
 			canvas.blocksRaycasts = false;
-			canvas.DOFade(0, 0.5f).OnComplete(()=> 
+			fadeTween=canvas.DOFade(0, 0.5f).OnComplete(()=> 
 			canvas.alpha=0);
 		}
 		
@@ -68,8 +69,8 @@ public abstract class ScrAbs : MonoBehaviour, IPage {
 
 	public virtual void Show() {
 		if (root != null) {
-	
-			canvas.DOFade(1, 0.5f).OnComplete(() => {
+			fadeTween?.Kill();
+			fadeTween=canvas.DOFade(1, 0.5f).OnComplete(() => {
 				canvas.blocksRaycasts = true;
 	
 			});

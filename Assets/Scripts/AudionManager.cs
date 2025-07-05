@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class AudionManager : MonoBehaviour
@@ -15,9 +16,14 @@ public class AudionManager : MonoBehaviour
     }
 	private void OnDestroy() {
 		EventBus.Bus.RemoveListener<string>(EventId.OnSound, PlaySound);
+        
+
+
 	}
 
 	private void PlaySound(string clipname) {
         audio.PlayOneShot(clips.FirstOrDefault(x=>x.name==clipname));
 	}
+    
+
 }

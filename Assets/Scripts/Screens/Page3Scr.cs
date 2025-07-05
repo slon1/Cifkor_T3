@@ -18,7 +18,7 @@ public class Page3Scr : ScrAbs
 	private AsyncTimer timer;
 	private int rowCount = 10;
 	private List<Data> data;
-	private bool started;
+
 
 	[SerializeField]
 	private GameObject content;
@@ -32,13 +32,10 @@ public class Page3Scr : ScrAbs
 		this.gui = gui;	
 	}
 	public override async void Show() {
-		if (!started) {
-			started = true;
-			base.Show();
-			data = await GetDataListAsync();
-			var names = data.Select(x => x.attributes.name).Take(rowCount).ToList();
-			LoadNames(names);
-		}
+		base.Show();
+		data= await GetDataListAsync();
+		var names= data.Select(x => x.attributes.name).Take(rowCount).ToList();
+		LoadNames(names);
 	}
 
 	private void LoadNames(List<string> names) {
@@ -61,7 +58,6 @@ public class Page3Scr : ScrAbs
 
 	public override void Hide() {
 		base.Hide();
-		started = false;
 	}
 
 	private async UniTask<Data> GetInfoAsync(string id) {

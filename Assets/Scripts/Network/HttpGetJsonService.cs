@@ -1,9 +1,6 @@
 using Cysharp.Threading.Tasks;
-using System;
-using Zenject;
-using UnityEngine;
 using Newtonsoft.Json;
-using System.Collections.Generic;
+using System;
 using System.Threading;
 
 public class HttpGetJsonService : IHttpGetJsonService {

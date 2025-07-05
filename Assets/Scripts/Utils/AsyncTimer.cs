@@ -13,28 +13,27 @@ public interface IAsyncTimer {
 
 
 public class AsyncTimer : IAsyncTimer {
-	private CancellationTokenSource _cts;
-	private bool _isRunning;
+	private CancellationTokenSource cts;
+	private bool isRunning;
 
-	public bool IsRunning => _isRunning;
+	public bool IsRunning => isRunning;
 
 	public void Start(Func<UniTask> action, TimeSpan interval) {
-		Stop(); // чтобы не запустилось дважды
+		Stop(); 
+		cts = new CancellationTokenSource();
+		isRunning = true;
 
-		_cts = new CancellationTokenSource();
-		_isRunning = true;
-
-		RunLoop(action, interval, _cts.Token).Forget();
+		RunLoop(action, interval, cts.Token).Forget();
 	}
 
 	public void Stop() {
-		if (!_isRunning)
+		if (!isRunning)
 			return;
 
-		_cts?.Cancel();
-		_cts?.Dispose();
-		_cts = null;
-		_isRunning = false;
+		cts?.Cancel();
+		cts?.Dispose();
+		cts = null;
+		isRunning = false;
 	}
 
 	private async UniTaskVoid RunLoop(Func<UniTask> action, TimeSpan interval, CancellationToken token) {
@@ -46,10 +45,10 @@ public class AsyncTimer : IAsyncTimer {
 			}
 		}
 		catch (OperationCanceledException) {
-			// нормально при остановке
+			
 		}
 		finally {
-			_isRunning = false;
+			isRunning = false;
 		}
 	}
 }
